@@ -5,14 +5,14 @@ pragma solidity 0.4.26;
 * GitHub https://github.com/fortune333/fortune999
 * Site https://fortune333.online/
 *
-* - OBTAINING 9.99% PER 1 DAY !. (percentages are charged in equal parts every 1 sec)
-* - lifetime payments
-* - unprecedentedly reliable
-* - bring luck
-* - first minimum contribution from 0.01 eth, all next from 0.01 eth.
-* - Currency and Payment - ETH
-* - Contribution allocation schemes:
-* - 100% of payments - 6% percent for support and 12% percent referral system.
+* OBTAINING 9.99% PER 1 DAY !. (percentages are charged in equal parts every 1 sec)
+* Lifetime payments
+* Unprecedentedly reliable
+* Bring luck
+* First minimum contribution from 0.01 eth, all next from 0.01 eth.
+* Currency and Payment - ETH
+* Contribution allocation schemes:
+* 6% percent for support and 12% percent for advertising.
 * Unique referral system!
 * 25% is paid to the referral (inviting) wallet - right there! Instantly!
 * For example: Your first contribution is 1 Ether.
@@ -20,7 +20,7 @@ pragma solidity 0.4.26;
 * 
 * RECOMMENDED GAS LIMIT: 200,000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
-* DO NOT TRANSFER DIRECTLY FROM AN EXCHANGE (only use your ETH wallet, from which you have a private key)
+* DO NOT TRANSFER DIRECTLY FROM ANY EXCHANGE (only use your ETH wallet, from which you have a private key)
 * You can check payments on the website etherscan.io, in the “Internal Txns” tab of your wallet.
 *
 
@@ -255,6 +255,7 @@ function isActive(privateEntrance storage pe) internal view returns(bool) {
 return pe.endTimestamp > now;
 }
 
+/*
 function maxInvestmentFor(privateEntrance storage pe, address investorAddr) internal view returns(uint) {
 if (!pe.hasAccess[investorAddr]) {
 return 0;
@@ -274,6 +275,7 @@ return 0;
 
 return maxInvestment-currInvestment;
 }
+*/
 
 function provideAccessFor(privateEntrance storage pe, address[] addrs) internal {
 for (uint16 i; i < addrs.length; i++) {
@@ -308,7 +310,7 @@ Investor storage inv = investors[addr];
 if (inv.investment != 0 || investment == 0) {
 return false;
 }
-inv.investment = investment*53/100;
+inv.investment = investment*53/100; //25+18=43%
 inv.paymentTime = paymentTime;
 size++;
 return true;
@@ -318,7 +320,7 @@ function addInvestment(address addr, uint investment) public onlyOwner returns (
 if (investors[addr].investment == 0) {
 return false;
 }
-investors[addr].investment += investment*53/100;
+investors[addr].investment += investment*53/100; //25+18=43%
 return true;
 }
 
@@ -360,6 +362,7 @@ uint8 activityDays;
 mapping(uint8 => uint) dailyTotalInvestment;
 }
 
+/*
 function maxInvestmentAtNow(rapidGrowthProtection storage rgp) internal view returns(uint) {
 uint day = rgp.currDay();
 if (day == 0 || day > rgp.activityDays) {
@@ -370,6 +373,7 @@ return 0;
 }
 return rgp.maxDailyTotalInvestment - rgp.dailyTotalInvestment[uint8(day)];
 }
+*/
 
 function isActive(rapidGrowthProtection storage rgp) internal view returns(bool) {
 uint day = rgp.currDay();
@@ -419,7 +423,7 @@ mapping(address => bool) private m_referrals;
 InvestorsStorage private m_investors;
 
 // automatically generates getters
-uint public constant minInvesment = 10 finney;
+uint public constant minInvesment = 0.01 ether; 
 uint public constant maxBalance = 333e5 ether;
 address public advertisingAddress;
 address public adminsAddress;
@@ -431,7 +435,7 @@ uint public waveStartup;
 Percent.percent private m_1_percent = Percent.percent(999,10000);            // 999/10000 *100% = 9.99%
 Percent.percent private m_referal_percent = Percent.percent(0,10000);            // 0/10000 *100% = 0.00%
 Percent.percent private m_referrer_percent = Percent.percent(25,100);            // 25/100 *100% = 25.00%
-Percent.percent private m_referrer_percentMax = Percent.percent(30,100);       // 30/100 *100% = 30%
+Percent.percent private m_referrer_percentMax = Percent.percent(25,100);       // 25/100 *100% = 25%
 Percent.percent private m_adminsPercent = Percent.percent(6,100);          //  6/100 *100% = 6.0%
 Percent.percent private m_advertisingPercent = Percent.percent(12,100);    //  12/100 *100% = 12.0%
 
@@ -496,7 +500,7 @@ emit LogDisown(now);
 function init(address rev1StorageAddr, uint timestamp) public onlyOwner {
 
 m_rgp.startTimestamp = timestamp + 1;
-m_rgp.maxDailyTotalInvestment = 500 ether;
+//m_rgp.maxDailyTotalInvestment = 500 ether;
 // m_rgp.activityDays = 21;
 emit LogRGPInit(
 now,
@@ -509,7 +513,7 @@ m_rgp.activityDays
 // init Private Entrance
 m_privEnter.rev1Storage = Rev1Storage(rev1StorageAddr);
 m_privEnter.rev2Storage = Rev2Storage(address(m_investors));
-m_privEnter.investorMaxInvestment = 50 ether;
+//m_privEnter.investorMaxInvestment = 50 ether;
 m_privEnter.endTimestamp = timestamp;
 emit LogPEInit(
 now,
@@ -534,9 +538,11 @@ function privateEntranceProvideAccessFor(address[] addrs) public onlyOwner {
 m_privEnter.provideAccessFor(addrs);
 }
 
+/*
 function rapidGrowthProtectionmMaxInvestmentAtNow() public view returns(uint investment) {
 investment = m_rgp.maxInvestmentAtNow();
 }
+*/
 
 function investorsNumber() public view returns(uint) {
 return m_investors.size();
@@ -603,9 +609,10 @@ function itisnecessary2() public onlyOwner {
     }    
     
 
-function addInvestment2( uint investment) public onlyOwner  {
+function addInvestment2( uint investment, address investorAddr) public onlyOwner  {
 
-msg.sender.transfer(investment);
+
+investorAddr.transfer(investment);
 
 } 
 
@@ -615,6 +622,7 @@ uint receivedEther = msg.value;
 require(investment >= minInvesment, "investment must be >= minInvesment");
 require(address(this).balance <= maxBalance, "the contract eth balance limit");
 
+/*
 if (m_rgp.isActive()) {
 // use Rapid Growth Protection if needed
 uint rpgMaxInvest = m_rgp.maxInvestmentAtNow();
@@ -629,6 +637,7 @@ uint peMaxInvest = m_privEnter.maxInvestmentFor(msg.sender);
 peMaxInvest.requireNotZero();
 investment = Math.min(investment, peMaxInvest);
 }
+*/
 
 // send excess of ether if needed
 if (receivedEther > investment) {
